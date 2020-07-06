@@ -3,6 +3,7 @@ import p5 from 'p5'
 
 const P5 = new p5(s)
 let canvas = null
+let fps
 function s(sk) {
 	sk.setup = () => {
 		canvas = sk.createCanvas(600, 600).parent('canvasContainer')
@@ -11,10 +12,25 @@ function s(sk) {
 		sk.angleMode(sk.DEGREES)
 
 		worm.setup()
+
+		// Perf
+		fps = P5.frameRate()
+		P5.fill(255)
+		P5.stroke(0)
 	}
 
 	sk.draw = () => {
-		worm.go()
+		if (!worm.dead) {
+			worm.go()
+			worm.dieTest()
+		}
+
+		fps = P5.frameRate()
+		P5.noStroke()
+		P5.fill('black')
+		P5.square(0, 0, 70, 30)
+		P5.fill('white')
+		P5.text('FPS: ' + fps.toFixed(2), 5, 20)
 	}
 }
 
@@ -31,6 +47,7 @@ let worm = {
 	control: { goRight: false, goLeft: false, sensitivity: 2 },
 	skin: [],
 	skinFrame: 0,
+	dead: false,
 
 	setup() {
 		console.log(this)
@@ -38,7 +55,7 @@ let worm = {
 		P5.strokeWeight(5)
 		P5.point(this.pos.x, this.pos.y)
 
-		this.setupSkin({ red: 20, lightBlue: 20 })
+		this.setupSkin({ pink: 40, lightBlue: 20 })
 
 		this.go()
 
@@ -91,5 +108,21 @@ let worm = {
 		}
 		P5.stroke(this.skin[this.skinFrame])
 		P5.line(this.pos.x, this.pos.y, newPos.x, newPos.y)
+	},
+
+	dieTest() {
+		let x = this.pos.x + P5.cos(this.dir) * this.speed * 2.6
+		let y = this.pos.y + P5.sin(this.dir) * this.speed * 2.6
+		// console.log(x, y, P5.get(x, y))
+		if (this.pos.x < 0 || this.pos.x > scene.width || this.pos.y < 0 || this.pos.y > scene.height) {
+			this.die()
+		} else if (P5.get(x, y)[0] !== 10) {
+			this.die()
+		}
+	},
+
+	die() {
+		this.dead = true
+		console.log(this.dead)
 	},
 }
