@@ -28,14 +28,17 @@ let worm = {
 	pos: P5.createVector(Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width, Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height),
 	dir: Math.round(Math.random() * 360),
 	speed: 1.2,
-
 	control: { goRight: false, goLeft: false, sensitivity: 2 },
+	skin: [],
+	skinFrame: 0,
 
 	setup() {
 		console.log(this)
 		P5.stroke('white')
 		P5.strokeWeight(5)
 		P5.point(this.pos.x, this.pos.y)
+
+		this.setupSkin({ red: 20, lightBlue: 20 })
 
 		this.go()
 
@@ -61,6 +64,14 @@ let worm = {
 		})
 	},
 
+	setupSkin(skin) {
+		for (const _key in skin) {
+			for (let i = 0; i < skin[_key]; i++) {
+				this.skin.push(_key)
+			}
+		}
+	},
+
 	go() {
 		// Adjust direction depending on control
 		this.control.goRight === true ? (this.dir += this.control.sensitivity) : null
@@ -73,6 +84,12 @@ let worm = {
 		this.pos = newPos
 
 		// Drawing line
+		if (this.skinFrame < this.skin.length - 1) {
+			this.skinFrame++
+		} else {
+			this.skinFrame = 0
+		}
+		P5.stroke(this.skin[this.skinFrame])
 		P5.line(this.pos.x, this.pos.y, newPos.x, newPos.y)
 	},
 }
