@@ -9,7 +9,70 @@ function s(sk) {
 		sk.background(10)
 		sk.frameRate(60)
 		sk.angleMode(sk.DEGREES)
+
+		worm.setup()
 	}
 
-	sk.draw = () => {}
+	sk.draw = () => {
+		worm.go()
+	}
+}
+
+let scene = {
+	width: 600,
+	height: 600,
+	spawnMargin: 0.15,
+}
+
+let worm = {
+	pos: P5.createVector(Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width, Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height),
+	dir: Math.round(Math.random() * 360),
+	speed: 1.2,
+
+	control: { goRight: false, goLeft: false, sensitivity: 2 },
+
+	setup() {
+		console.log(this)
+		P5.stroke('white')
+		P5.strokeWeight(5)
+		P5.point(this.pos.x, this.pos.y)
+
+		this.go()
+
+		window.addEventListener('keydown', (_event) => {
+			switch (_event.code) {
+				case 'KeyW':
+					this.control.goRight = true
+					break
+				case 'KeyQ':
+					this.control.goLeft = true
+					break
+			}
+		})
+		window.addEventListener('keyup', (_event) => {
+			switch (_event.code) {
+				case 'KeyW':
+					this.control.goRight = false
+					break
+				case 'KeyQ':
+					this.control.goLeft = false
+					break
+			}
+		})
+	},
+
+	go() {
+		// Adjust direction depending on control
+		this.control.goRight === true ? (this.dir += this.control.sensitivity) : null
+		this.control.goLeft === true ? (this.dir -= this.control.sensitivity) : null
+
+		// Updating pos
+		let newPos = {}
+		newPos.x = this.pos.x + P5.cos(this.dir) * this.speed
+		newPos.y = this.pos.y + P5.sin(this.dir) * this.speed
+		this.pos = newPos
+
+		// Drawing line
+		P5.line(this.pos.x, this.pos.y, newPos.x, newPos.y)
+	},
 }
