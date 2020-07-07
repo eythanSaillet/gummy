@@ -1,37 +1,36 @@
-import './style/main.scss'
-import p5 from 'p5'
+setup = () => {
+	let canvas = createCanvas(600, 600).parent('canvasContainer')
+	background(10)
+	frameRate(60)
+	angleMode(DEGREES)
 
-const P5 = new p5(s)
-let canvas = null
-let fps
-function s(sk) {
-	sk.setup = () => {
-		canvas = sk.createCanvas(600, 600).parent('canvasContainer')
-		sk.background(10)
-		sk.frameRate(60)
-		sk.angleMode(sk.DEGREES)
+	worm.setup()
 
-		worm.setup()
+	let socket = io.connect('localhost:3000')
+	console.log(socket)
 
-		// Perf
-		fps = P5.frameRate()
-		P5.fill(255)
-		P5.stroke(0)
+	// Fps displayer
+	let fps = frameRate()
+	fill(255)
+	stroke(0)
+
+	// let customDrawID = window.setInterval(() => {
+	// 	console.log('bim')
+	// }, 100)
+}
+
+draw = () => {
+	if (!worm.dead) {
+		worm.go()
+		worm.dieTest()
 	}
 
-	sk.draw = () => {
-		if (!worm.dead) {
-			worm.go()
-			worm.dieTest()
-		}
-
-		fps = P5.frameRate()
-		P5.noStroke()
-		P5.fill('black')
-		P5.square(0, 0, 70, 30)
-		P5.fill('white')
-		P5.text('FPS: ' + fps.toFixed(2), 5, 20)
-	}
+	fps = frameRate()
+	noStroke()
+	fill('black')
+	square(0, 0, 70, 30)
+	fill('white')
+	text('FPS: ' + fps.toFixed(2), 5, 20)
 }
 
 let scene = {
@@ -41,21 +40,23 @@ let scene = {
 }
 
 let worm = {
-	pos: P5.createVector(Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width, Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height),
+	pos: null,
 	dir: Math.round(Math.random() * 360),
-	speed: 1.2,
+	speed: 1,
+	size: 8,
 	control: { goRight: false, goLeft: false, sensitivity: 2 },
 	skin: [],
 	skinFrame: 0,
 	dead: false,
 
 	setup() {
+		this.pos = createVector(Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width, Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height)
 		console.log(this)
-		P5.stroke('white')
-		P5.strokeWeight(5)
-		P5.point(this.pos.x, this.pos.y)
+		stroke('white')
+		strokeWeight(this.size)
+		point(this.pos.x, this.pos.y)
 
-		this.setupSkin({ pink: 40, lightBlue: 20 })
+		this.setupSkin({ purple: 20, blue: 20, green: 20, yellow: 20, orange: 20, red: 20 })
 
 		this.go()
 
@@ -96,8 +97,8 @@ let worm = {
 
 		// Updating pos
 		let newPos = {}
-		newPos.x = this.pos.x + P5.cos(this.dir) * this.speed
-		newPos.y = this.pos.y + P5.sin(this.dir) * this.speed
+		newPos.x = this.pos.x + cos(this.dir) * this.speed
+		newPos.y = this.pos.y + sin(this.dir) * this.speed
 		this.pos = newPos
 
 		// Drawing line
@@ -106,23 +107,23 @@ let worm = {
 		} else {
 			this.skinFrame = 0
 		}
-		P5.stroke(this.skin[this.skinFrame])
-		P5.line(this.pos.x, this.pos.y, newPos.x, newPos.y)
+		stroke(this.skin[this.skinFrame])
+		line(this.pos.x, this.pos.y, newPos.x, newPos.y)
 	},
 
 	dieTest() {
-		let x = this.pos.x + P5.cos(this.dir) * this.speed * 2.6
-		let y = this.pos.y + P5.sin(this.dir) * this.speed * 2.6
-		// console.log(x, y, P5.get(x, y))
+		let x = this.pos.x + (cos(this.dir) * this.size) / 1.5
+		let y = this.pos.y + (sin(this.dir) * this.size) / 1.5
+		// console.log(x, y, get(x, y))
 		if (this.pos.x < 0 || this.pos.x > scene.width || this.pos.y < 0 || this.pos.y > scene.height) {
 			this.die()
-		} else if (P5.get(x, y)[0] !== 10) {
+		} else if (get(x, y)[0] !== 10) {
 			this.die()
 		}
 	},
 
 	die() {
 		this.dead = true
-		console.log(this.dead)
+		console.log('dead')
 	},
 }
