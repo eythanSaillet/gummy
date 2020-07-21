@@ -15,4 +15,9 @@ io.sockets.on('connection', newConnection)
 function newConnection(socket) {
 	console.log('New connection : ' + socket.id)
 	socket.emit('id', socket.id)
+
+	//
+	// socket.on('key', (key) => {
+	// 	console.log(key)
+	// })
 }
