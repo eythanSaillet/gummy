@@ -1,13 +1,12 @@
 let ballsArray = []
 
 class Balls {
-	constructor(pos, type, effect) {
+	constructor(pos, type) {
 		this.pos = pos
 		this.type = type
-		this.effect = effect
 
 		// Drawing
-		stroke('white')
+		stroke(ballsTypes[type].color)
 		strokeWeight(10)
 		point(this.pos.x, this.pos.y)
 
@@ -19,4 +18,44 @@ class Balls {
 		strokeWeight(12)
 		point(this.pos.x, this.pos.y)
 	}
+}
+
+// Effect
+
+// Speed
+let speedBallEffect = () => {
+	const tempSpeed = worm.speed
+	worm.speed = 1.7
+	setTimeout(() => {
+		worm.speed = tempSpeed
+	}, 4000)
+}
+let bigBallEffect = () => {
+	const tempBig = worm.size
+	worm.size = 15
+	setTimeout(() => {
+		worm.size = tempBig
+	}, 4000)
+}
+let tinyBallEffect = () => {
+	const temptiny = worm.size
+	worm.size = 4
+	setTimeout(() => {
+		worm.size = temptiny
+	}, 4000)
+}
+
+let ballsTypes = {
+	speed: {
+		color: 'red',
+		effect: speedBallEffect,
+	},
+	big: {
+		color: 'blue',
+		effect: bigBallEffect,
+	},
+	tiny: {
+		color: 'green',
+		effect: tinyBallEffect,
+	},
 }

@@ -2,7 +2,8 @@ let worm = {
 	id: null,
 	canGo: false,
 	pos: null,
-	dir: Math.round(Math.random() * 360),
+	// dir: Math.round(Math.random() * 360),
+	dir: 90,
 	speed: 1,
 	size: 8,
 	control: { goRight: false, goLeft: false, sensitivity: 1.5 },
@@ -75,19 +76,26 @@ let worm = {
 	},
 
 	getSensorInfos() {
-		// Get position of 3 possible collision point
+		// Get position of 3 possible collision points
 		let frontSensor = {
-			x: this.pos.x + (cos(this.dir) * this.size) / 1.5,
-			y: this.pos.y + (sin(this.dir) * this.size) / 1.5,
+			x: this.pos.x + cos(this.dir) * this.size * 0.8,
+			y: this.pos.y + sin(this.dir) * this.size * 0.8,
 		}
 		let leftSensor = {
-			x: this.pos.x + (cos(this.dir - 90) * this.size) / 1.5,
-			y: this.pos.y + (sin(this.dir - 90) * this.size) / 1.5,
+			x: this.pos.x + cos(this.dir - 90) * this.size * 0.8,
+			y: this.pos.y + sin(this.dir - 90) * this.size * 0.8,
 		}
 		let rightSensor = {
-			x: this.pos.x + (cos(this.dir + 90) * this.size) / 1.5,
-			y: this.pos.y + (sin(this.dir + 90) * this.size) / 1.5,
+			x: this.pos.x + cos(this.dir + 90) * this.size * 0.8,
+			y: this.pos.y + sin(this.dir + 90) * this.size * 0.8,
 		}
+		// Debug : draw sensor
+		stroke('white')
+		strokeWeight(1)
+		point(frontSensor.x, frontSensor.y)
+		point(leftSensor.x, leftSensor.y)
+		point(rightSensor.x, rightSensor.y)
+
 		// Get colors on these points
 		let colors = {
 			front: get(frontSensor.x, frontSensor.y)[0],

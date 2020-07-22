@@ -12,15 +12,12 @@ setup = () => {
 		console.log('connected')
 	})
 
-	let ball1 = new Balls(createVector(250, 250), 'testType', () => {
-		console.log('speeeeeeed')
-	})
-	let ball2 = new Balls(createVector(300, 300), 'testType', () => {
-		console.log('biiiiiiiig')
-	})
-	let ball3 = new Balls(createVector(100, 430), 'testType', () => {
-		console.log('invert')
-	})
+	let ball1 = new Balls(createVector(250, 250), 'speed')
+	let ball2 = new Balls(createVector(300, 300), 'big')
+	let ball3 = new Balls(createVector(100, 430), 'tiny')
+	let ball4 = new Balls(createVector(50, 400), 'speed')
+	let ball5 = new Balls(createVector(400, 50), 'big')
+	let ball6 = new Balls(createVector(185, 332), 'tiny')
 
 	// Fps displayer
 	let fps = frameRate()
@@ -32,15 +29,17 @@ draw = () => {
 	if (!worm.dead && worm.canGo) {
 		worm.go()
 		let colors = worm.getSensorInfos()
-		worm.dieTest(colors)
+		// worm.dieTest(colors)
 
 		// Test balls proximity
 		for (let i = ballsArray.length - 1; i >= 0; i--) {
 			let distance = worm.pos.dist(ballsArray[i].pos)
 			if (distance < 12) {
-				console.log('took')
-				ballsArray[i].effect()
+				// Execute ball effect
+				ballsTypes[ballsArray[i].type].effect()
+				// Erase ball from the canvas
 				ballsArray[i].erase()
+				// Remove ball from the array
 				ballsArray.splice(i, 1)
 			}
 		}
@@ -66,3 +65,8 @@ let scene = {
 }
 
 let player = {}
+
+// Debug : check color on click
+function mouseClicked() {
+	console.log(get(mouseX, mouseY))
+}
