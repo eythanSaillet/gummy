@@ -1,4 +1,4 @@
-let socket
+let socket, posLogMatrix
 setup = () => {
 	let canvas = createCanvas(600, 600).parent('canvasContainer')
 	background(10)
@@ -19,6 +19,19 @@ setup = () => {
 	let ball5 = new Balls(createVector(400, 50), 'big')
 	let ball6 = new Balls(createVector(185, 332), 'tiny')
 
+	// Setup position log matrix
+	let posLogMatrixWidth = 20
+	let posLogMatrixHeight = 20
+	posLogMatrix = []
+	for (let i = 0; i < posLogMatrixWidth; i++) {
+		let tab = []
+		for (let j = 0; j < posLogMatrixHeight; j++) {
+			tab.push([])
+		}
+		posLogMatrix.push(tab)
+	}
+	console.log(posLogMatrix)
+
 	// Fps displayer
 	let fps = frameRate()
 	fill(255)
@@ -28,8 +41,8 @@ setup = () => {
 draw = () => {
 	if (!worm.dead && worm.canGo) {
 		worm.go()
-		let colors = worm.getSensorInfos()
-		// worm.dieTest(colors)
+		// let colors = worm.getSensorInfos()
+		worm.dieTest()
 
 		// Test balls proximity
 		for (let i = ballsArray.length - 1; i >= 0; i--) {
@@ -49,13 +62,16 @@ draw = () => {
 	fps = frameRate()
 	noStroke()
 	fill('black')
-	square(0, 0, 70, 30)
+	square(0, 0, 60, 10)
 	fill('white')
 	text('FPS: ' + fps.toFixed(0), 5, 20)
 }
 
 document.querySelector('.playButton').addEventListener('click', () => {
 	worm.setup()
+})
+document.querySelector('.pauseButton').addEventListener('click', () => {
+	worm.canGo === true ? (worm.canGo = false) : (worm.canGo = true)
 })
 
 let scene = {
