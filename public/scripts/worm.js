@@ -4,12 +4,15 @@ let worm = {
 	pos: null,
 	// dir: Math.round(Math.random() * 360),
 	dir: 90,
-	speed: 1,
-	size: 8,
+	basicSpeed: 1,
+	speed: null,
+	basicSize: 8,
+	size: null,
 	control: { goRight: false, goLeft: false, sensitivity: 1.5 },
 	skin: [],
 	skinFrame: 0,
 	dead: false,
+	canGoThroughWall: false,
 
 	setup() {
 		console.log(socket.id)
@@ -18,6 +21,9 @@ let worm = {
 		this.canGo = true
 
 		this.pos = createVector(Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width, Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height)
+
+		this.speed = this.basicSpeed
+		this.size = this.basicSize
 
 		strokeWeight(this.size)
 		this.setupSkin({ purple: 20, blue: 20, green: 20, yellow: 20, orange: 20, red: 20 })
@@ -73,23 +79,29 @@ let worm = {
 		strokeWeight(this.size)
 		stroke(this.skin[this.skinFrame])
 		line(this.pos.x, this.pos.y, newPos.x, newPos.y)
-
-		// Fill posLogMatrix
-		this.fillPosLogMatrix()
 	},
 
 	fillPosLogMatrix() {
 		let pos = this.pos
 		let size = this.size
 		setTimeout(() => {
-			posLogMatrix[Math.floor(pos.x / 60)][Math.floor(pos.y / 60)].push([pos, size])
-		}, 400)
+			if (!scene.isClearing) {
+				posLogMatrix[Math.floor(pos.x / 60)][Math.floor(pos.y / 60)].push([pos, size])
+			}
+		}, scene.selfCollisionDelay)
 	},
 
 	dieTest() {
 		// Map border test
 		if (this.pos.x < 0 || this.pos.x > scene.width || this.pos.y < 0 || this.pos.y > scene.height) {
-			this.die()
+			if (this.canGoThroughWall) {
+				this.pos.x < 0 ? (this.pos.x = this.pos.x = scene.width) : null
+				this.pos.x > scene.width ? (this.pos.x = 0) : null
+				this.pos.y < 0 ? (this.pos.y = scene.height) : null
+				this.pos.y > scene.height ? (this.pos.y = 0) : null
+			} else {
+				this.die()
+			}
 		}
 		// Worms collision test
 		else {
@@ -102,6 +114,9 @@ let worm = {
 					this.die()
 				}
 			}
+
+			// Fill posLogMatrix
+			this.fillPosLogMatrix()
 		}
 	},
 

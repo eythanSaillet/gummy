@@ -1,5 +1,6 @@
 body {
 	margin: 0;
+	background: grey;
 }
 
 #canvasContainer {
@@ -8,4 +9,7 @@ body {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+	canvas {
+		border: solid black 2px;
+	}
 }

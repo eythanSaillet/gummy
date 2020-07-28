@@ -1,7 +1,19 @@
-let socket, posLogMatrix
+let socket, canvas, posLogMatrix
+
+let scene = {
+	width: 600,
+	height: 600,
+	spawnMargin: 0.15,
+	background: 10,
+	posLogMatrixWidth: 40,
+	posLogMatrixHeight: 40,
+	selfCollisionDelay: 400,
+	isClearing: false,
+}
+
 setup = () => {
-	let canvas = createCanvas(600, 600).parent('canvasContainer')
-	background(10)
+	canvas = createCanvas(scene.width, scene.height).parent('canvasContainer')
+	background(scene.background)
 	frameRate(60)
 	angleMode(DEGREES)
 	// strokeCap(SQUARE)
@@ -18,18 +30,29 @@ setup = () => {
 	let ball4 = new Balls(createVector(50, 400), 'speed')
 	let ball5 = new Balls(createVector(400, 50), 'big')
 	let ball6 = new Balls(createVector(185, 332), 'tiny')
+	let ball7 = new Balls(createVector(400, 400), 'wall')
+	let ball8 = new Balls(createVector(200, 200), 'wall')
+	let ball9 = new Balls(createVector(450, 400), 'clear')
+	let ball10 = new Balls(createVector(150, 230), 'clear')
 
 	// Setup position log matrix
-	let posLogMatrixWidth = 40
-	let posLogMatrixHeight = 40
 	posLogMatrix = []
-	for (let i = 0; i < posLogMatrixWidth; i++) {
+	for (let i = 0; i < scene.posLogMatrixWidth; i++) {
 		let tab = []
-		for (let j = 0; j < posLogMatrixHeight; j++) {
+		for (let j = 0; j < scene.posLogMatrixHeight; j++) {
 			tab.push([])
 		}
 		posLogMatrix.push(tab)
 	}
+	// Paint grid
+	// stroke(40)
+	// strokeWeight(1)
+	// for (let i = 0; i < scene.posLogMatrixWidth; i++) {
+	// 	line((i * scene.width) / scene.posLogMatrixWidth, 0, (i * scene.width) / scene.posLogMatrixWidth, scene.height)
+	// }
+	// for (let i = 0; i < scene.posLogMatrixWidth; i++) {
+	// 	line(0, (i * scene.height) / scene.posLogMatrixHeight, scene.width, (i * scene.height) / scene.posLogMatrixHeight)
+	// }
 
 	// Fps displayer
 	let fps = frameRate()
@@ -45,7 +68,7 @@ draw = () => {
 		// Test balls proximity
 		for (let i = ballsArray.length - 1; i >= 0; i--) {
 			let distance = worm.pos.dist(ballsArray[i].pos)
-			if (distance < 12) {
+			if (distance < ballsArray[i].size / 2 + worm.size / 2) {
 				// Execute ball effect
 				ballsTypes[ballsArray[i].type].effect()
 				// Erase ball from the canvas
@@ -72,10 +95,9 @@ document.querySelector('.pauseButton').addEventListener('click', () => {
 	worm.canGo === true ? (worm.canGo = false) : (worm.canGo = true)
 })
 
-let scene = {
-	width: 600,
-	height: 600,
-	spawnMargin: 0.15,
-}
-
 let player = {}
+
+// Window blur event
+window.addEventListener('blur', () => {
+	console.log('blur')
+})
