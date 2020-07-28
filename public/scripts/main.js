@@ -20,8 +20,8 @@ setup = () => {
 	let ball6 = new Balls(createVector(185, 332), 'tiny')
 
 	// Setup position log matrix
-	let posLogMatrixWidth = 20
-	let posLogMatrixHeight = 20
+	let posLogMatrixWidth = 40
+	let posLogMatrixHeight = 40
 	posLogMatrix = []
 	for (let i = 0; i < posLogMatrixWidth; i++) {
 		let tab = []
@@ -30,7 +30,6 @@ setup = () => {
 		}
 		posLogMatrix.push(tab)
 	}
-	console.log(posLogMatrix)
 
 	// Fps displayer
 	let fps = frameRate()
@@ -41,7 +40,6 @@ setup = () => {
 draw = () => {
 	if (!worm.dead && worm.canGo) {
 		worm.go()
-		// let colors = worm.getSensorInfos()
 		worm.dieTest()
 
 		// Test balls proximity
@@ -81,8 +79,3 @@ let scene = {
 }
 
 let player = {}
-
-// Debug : check color on click
-function mouseClicked() {
-	console.log(get(mouseX, mouseY))
-}

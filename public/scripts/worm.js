@@ -80,59 +80,27 @@ let worm = {
 
 	fillPosLogMatrix() {
 		let pos = this.pos
+		let size = this.size
 		setTimeout(() => {
-			posLogMatrix[Math.floor(pos.x / 30)][Math.floor(pos.y / 30)].push(pos)
-		}, 200)
-	},
-
-	getSensorInfos() {
-		// Get position of 3 possible collision points
-		let frontSensor = {
-			x: this.pos.x + cos(this.dir) * this.size * 0.8 - 1,
-			y: this.pos.y + sin(this.dir) * this.size * 0.8 - 1,
-		}
-		let leftSensor = {
-			x: this.pos.x + cos(this.dir - 90) * this.size * 0.8 - 1,
-			y: this.pos.y + sin(this.dir - 90) * this.size * 0.8 - 1,
-		}
-		let rightSensor = {
-			x: this.pos.x + cos(this.dir + 90) * this.size * 0.8,
-			y: this.pos.y + sin(this.dir + 90) * this.size * 0.8,
-		}
-		// Debug : draw sensor
-		stroke('white')
-		strokeWeight(1)
-		point(frontSensor.x, frontSensor.y)
-		point(leftSensor.x, leftSensor.y)
-		point(rightSensor.x, rightSensor.y)
-		point(this.pos.x, this.pos.y)
-
-		// Get colors on these points
-		let colors = {
-			front: get(frontSensor.x, frontSensor.y)[0],
-			left: get(leftSensor.x, leftSensor.y)[0],
-			right: get(rightSensor.x, rightSensor.y)[0],
-		}
-		return colors
+			posLogMatrix[Math.floor(pos.x / 60)][Math.floor(pos.y / 60)].push([pos, size])
+		}, 400)
 	},
 
 	dieTest() {
-		// Map Border test
+		// Map border test
 		if (this.pos.x < 0 || this.pos.x > scene.width || this.pos.y < 0 || this.pos.y > scene.height) {
 			this.die()
 		}
-		// Obstacle test
-		// else if (colors.front > 10 || colors.left > 10 || colors.right > 10) {
-		// 	this.die()
-		// }
-		for (const _position of posLogMatrix[Math.floor(this.pos.x / 30)][Math.floor(this.pos.y / 30)]) {
-			if (_position.dist(this.pos) < 10) {
-				console.log(this.pos, _position, _position.dist(this.pos))
-				stroke('white')
-				strokeWeight(1)
-				point(this.pos)
-				point(_position)
-				this.die()
+		// Worms collision test
+		else {
+			for (const _log of posLogMatrix[Math.floor(this.pos.x / 60)][Math.floor(this.pos.y / 60)]) {
+				if (_log[0].dist(this.pos) < _log[1] / 2 + this.size / 2 && this.dead === false) {
+					stroke('white')
+					strokeWeight(1)
+					point(this.pos)
+					point(_log)
+					this.die()
+				}
 			}
 		}
 	},
