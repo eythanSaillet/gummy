@@ -14,6 +14,9 @@ let worm = {
 	dead: false,
 	canGoThroughWall: false,
 	sizeEffectTimer: 0,
+	increaseSizeIntervalID: null,
+	decreaseSizeIntervalID: null,
+	returnSizeIntervalID: null,
 
 	setup() {
 		console.log(socket.id)

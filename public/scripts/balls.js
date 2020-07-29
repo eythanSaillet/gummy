@@ -36,57 +36,61 @@ let speedBallEffect = () => {
 	}, 4000)
 }
 
-// Big size
-let increaseIntervalID
 let bigBallEffect = () => {
-	clearInterval(decreaseIntervalID)
-	increaseIntervalID = setInterval(() => {
-		if (worm.size >= 16) {
-			clearInterval(increaseIntervalID)
+	increaseEffect('size', 15, 'basicSize', 14, 'sizeEffectTimer', 'increaseSizeIntervalID', 'decreaseSizeIntervalID', 'returnSizeIntervalID')
+}
+let tinyBallEffect = () => {
+	decreaseEffect('size', 4, 'basicSize', 14, 'sizeEffectTimer', 'increaseSizeIntervalID', 'decreaseSizeIntervalID', 'returnSizeIntervalID')
+}
+
+// Big size
+let increaseEffect = (parameter, value, basicValue, delay, effectTimer, increaseIntervalID, decreaseIntervalID, returnIntervalID) => {
+	clearInterval(worm[decreaseIntervalID])
+	worm[increaseIntervalID] = setInterval(() => {
+		if (worm[parameter] >= value) {
+			clearInterval(worm[increaseIntervalID])
 		} else {
-			worm.size++
+			worm[parameter]++
 		}
 	}, 100)
-	returnToNormalSize()
+	returnToNormalEffect(parameter, basicValue, delay, effectTimer, returnIntervalID)
 }
 
 // Tiny size
-let decreaseIntervalID
-let tinyBallEffect = () => {
-	clearInterval(increaseIntervalID)
-	decreaseIntervalID = setInterval(() => {
-		if (worm.size <= 3) {
-			clearInterval(decreaseIntervalID)
+let decreaseEffect = (parameter, value, basicValue, delay, effectTimer, increaseIntervalID, decreaseIntervalID, returnIntervalID) => {
+	clearInterval(worm[increaseIntervalID])
+	worm[decreaseIntervalID] = setInterval(() => {
+		if (worm[parameter] <= value) {
+			clearInterval(worm[decreaseIntervalID])
 		} else {
-			worm.size--
+			worm[parameter]--
 		}
 	}, 100)
-	returnToNormalSize()
+	returnToNormalEffect(parameter, basicValue, delay, effectTimer, returnIntervalID)
 }
 
 // Return to normal size
-let sizeEffectIntervalID
-let returnToNormalSize = () => {
+let returnToNormalEffect = (parameter, basicValue, delay, effectTimer, returnIntervalID) => {
 	// Handle delay with interval
-	clearInterval(sizeEffectIntervalID)
-	worm.sizeEffectTimer = 14
-	if (worm.sizeEffectTimer === 14) {
-		sizeEffectIntervalID = setInterval(() => {
-			worm.sizeEffectTimer--
+	clearInterval(worm[returnIntervalID])
+	worm[effectTimer] = delay
+	if (worm[effectTimer] === delay) {
+		worm[returnIntervalID] = setInterval(() => {
+			worm[effectTimer]--
 
 			// When time is up : return to normal
-			if (worm.sizeEffectTimer === 0) {
-				clearInterval(sizeEffectIntervalID)
+			if (worm[effectTimer] === 0) {
+				clearInterval(worm[returnIntervalID])
 
 				// Decrease or increase size
-				let returnIntervalID = setInterval(() => {
-					worm.sizeEffectTimer++
-					if (worm.size > worm.basicSize) {
-						worm.size--
-					} else if (worm.size < worm.basicSize) {
-						worm.size++
-					} else if (worm.size === worm.basicSize) {
-						clearInterval(returnIntervalID)
+				let intervalID = setInterval(() => {
+					worm[effectTimer]++
+					if (worm[parameter] > worm[basicValue]) {
+						worm[parameter]--
+					} else if (worm[parameter] < worm[basicValue]) {
+						worm[parameter]++
+					} else if (worm[parameter] === worm[basicValue]) {
+						clearInterval(intervalID)
 					}
 				}, 100)
 			}
