@@ -9,6 +9,7 @@ let scene = {
 	posLogMatrixHeight: 40,
 	selfCollisionDelay: 400,
 	isClearing: false,
+	wallEffectTimer: 0,
 }
 
 setup = () => {
@@ -32,6 +33,8 @@ setup = () => {
 	let ball6 = new Balls(createVector(185, 332), 'tiny')
 	let ball7 = new Balls(createVector(400, 400), 'wall')
 	let ball8 = new Balls(createVector(200, 200), 'wall')
+	let ball11 = new Balls(createVector(230, 230), 'wall')
+	let ball12 = new Balls(createVector(210, 240), 'wall')
 	let ball9 = new Balls(createVector(450, 400), 'clear')
 	let ball10 = new Balls(createVector(150, 230), 'clear')
 
@@ -97,7 +100,8 @@ document.querySelector('.pauseButton').addEventListener('click', () => {
 
 let player = {}
 
-// Window blur event
-window.addEventListener('blur', () => {
-	console.log('blur')
+// Tab change event
+document.addEventListener('visibilitychange', function () {
+	document.title = document.visibilityState
+	console.log(document.visibilityState)
 })

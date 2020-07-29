@@ -13,6 +13,7 @@ let worm = {
 	skinFrame: 0,
 	dead: false,
 	canGoThroughWall: false,
+	sizeEffectTimer: 0,
 
 	setup() {
 		console.log(socket.id)

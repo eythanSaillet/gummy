@@ -37,60 +37,90 @@ let speedBallEffect = () => {
 }
 
 // Big size
+let increaseIntervalID
 let bigBallEffect = () => {
-	let increaseIntervalID = setInterval(() => {
-		worm.size++
-		if (worm.size === 15) {
+	clearInterval(decreaseIntervalID)
+	increaseIntervalID = setInterval(() => {
+		if (worm.size >= 16) {
 			clearInterval(increaseIntervalID)
+		} else {
+			worm.size++
 		}
 	}, 100)
-	setTimeout(() => {
-		let decreaseIntervalID = setInterval(() => {
-			worm.size--
-			if (worm.size === worm.basicSize) {
-				clearInterval(decreaseIntervalID)
-			}
-		}, 100)
-	}, 4000)
+	returnToNormalSize()
 }
 
 // Tiny size
+let decreaseIntervalID
 let tinyBallEffect = () => {
-	let decreaseIntervalID = setInterval(() => {
-		worm.size--
-		if (worm.size === 4) {
+	clearInterval(increaseIntervalID)
+	decreaseIntervalID = setInterval(() => {
+		if (worm.size <= 3) {
 			clearInterval(decreaseIntervalID)
+		} else {
+			worm.size--
 		}
 	}, 100)
-	setTimeout(() => {
-		let increaseIntervalID = setInterval(() => {
-			worm.size++
-			if (worm.size === worm.basicSize) {
-				clearInterval(increaseIntervalID)
+	returnToNormalSize()
+}
+
+// Return to normal size
+let sizeEffectIntervalID
+let returnToNormalSize = () => {
+	// Handle delay with interval
+	clearInterval(sizeEffectIntervalID)
+	worm.sizeEffectTimer = 14
+	if (worm.sizeEffectTimer === 14) {
+		sizeEffectIntervalID = setInterval(() => {
+			worm.sizeEffectTimer--
+
+			// When time is up : return to normal
+			if (worm.sizeEffectTimer === 0) {
+				clearInterval(sizeEffectIntervalID)
+
+				// Decrease or increase size
+				let returnIntervalID = setInterval(() => {
+					worm.sizeEffectTimer++
+					if (worm.size > worm.basicSize) {
+						worm.size--
+					} else if (worm.size < worm.basicSize) {
+						worm.size++
+					} else if (worm.size === worm.basicSize) {
+						clearInterval(returnIntervalID)
+					}
+				}, 100)
 			}
-		}, 100)
-	}, 4000)
+		}, 500)
+	}
 }
 
 // Wall teleport
 let wallBallEffect = () => {
-	worm.canGoThroughWall = true
+	scene.wallEffectTimer += 14
 
-	// Display wall effect
-	let wallIndexes = true
-	canvas.canvas.style.border = 'solid yellow 2px'
-	let intervalID = setInterval(() => {
-		wallIndexes === true ? (wallIndexes = false) : (wallIndexes = true)
-		canvas.canvas.style.border = wallIndexes === true ? 'solid yellow 2px' : 'solid black 2px'
-	}, 500)
+	// Launch the effect only if it is not active, if not : just increase the timer
+	if (scene.wallEffectTimer === 14) {
+		worm.canGoThroughWall = true
 
-	// Kill the effect after a delay
-	setTimeout(() => {
-		worm.canGoThroughWall = false
+		// Display wall border effect
+		let wallIndexes = true
+		canvas.canvas.style.border = 'solid yellow 2px'
 
-		clearInterval(intervalID)
-		canvas.canvas.style.border = 'solid black 2px'
-	}, 6000)
+		let intervalID = setInterval(() => {
+			scene.wallEffectTimer--
+			// Kill the effect when the time is up
+			if (scene.wallEffectTimer === 0) {
+				worm.canGoThroughWall = false
+				clearInterval(intervalID)
+				canvas.canvas.style.border = 'solid black 2px'
+			}
+			// Toggle the border effect
+			else {
+				wallIndexes === true ? (wallIndexes = false) : (wallIndexes = true)
+				canvas.canvas.style.border = wallIndexes === true ? 'solid yellow 2px' : 'solid black 2px'
+			}
+		}, 500)
+	}
 }
 
 // Clear effect
