@@ -83,6 +83,9 @@ let worm = {
 		strokeWeight(this.size)
 		stroke(this.skin[this.skinFrame])
 		line(this.pos.x, this.pos.y, newPos.x, newPos.y)
+
+		// Send pos to server
+		socket.emit('go', { id: worm.id, x: newPos.x, y: newPos.y, size: worm.size, skin: worm.skin[worm.skinFrame] })
 	},
 
 	fillPosLogMatrix() {
@@ -127,6 +130,9 @@ let worm = {
 	die() {
 		this.dead = true
 		console.log('dead')
+
+		// Send death info to server
+		socket.emit('die', worm.id)
 	},
 
 	ballsTest(colors) {

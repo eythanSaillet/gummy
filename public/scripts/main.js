@@ -10,6 +10,7 @@ let scene = {
 	selfCollisionDelay: 400,
 	isClearing: false,
 	wallEffectTimer: 0,
+	otherPlayersPos: {},
 }
 
 setup = () => {
@@ -47,6 +48,10 @@ setup = () => {
 		}
 		posLogMatrix.push(tab)
 	}
+
+	// Setup socket
+	getOtherPlayersInfo()
+
 	// Paint grid
 	// stroke(40)
 	// strokeWeight(1)
@@ -89,6 +94,40 @@ draw = () => {
 	square(0, 0, 60, 10)
 	fill('white')
 	text('FPS: ' + fps.toFixed(0), 5, 20)
+}
+
+function getOtherPlayersInfo() {
+	socket.on('otherPlayersInfo', (pos) => {
+		// Draw other players
+		if (scene.otherPlayersPos[pos.id] === undefined) {
+			scene.otherPlayersPos[pos.id] = {}
+			scene.otherPlayersPos[pos.id].x = pos.x
+			scene.otherPlayersPos[pos.id].y = pos.y
+		} else {
+			strokeWeight(pos.size)
+			stroke(pos.skin)
+			line(scene.otherPlayersPos[pos.id].x, scene.otherPlayersPos[pos.id].y, pos.x, pos.y)
+
+			scene.otherPlayersPos[pos.id].x = pos.x
+			scene.otherPlayersPos[pos.id].y = pos.y
+		}
+
+		// // Updating pos
+		// let newPos = createVector()
+		// newPos.x = this.pos.x + cos(this.dir) * this.speed
+		// newPos.y = this.pos.y + sin(this.dir) * this.speed
+		// this.pos = newPos
+
+		// // Drawing line
+		// if (this.skinFrame < this.skin.length - 1) {
+		// 	this.skinFrame++
+		// } else {
+		// 	this.skinFrame = 0
+		// }
+		// strokeWeight(this.size)
+		// stroke(this.skin[this.skinFrame])
+		// line(this.pos.x, this.pos.y, newPos.x, newPos.y)
+	})
 }
 
 document.querySelector('.playButton').addEventListener('click', () => {
