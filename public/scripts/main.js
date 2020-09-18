@@ -23,7 +23,16 @@ setup = () => {
 	socket = io.connect('localhost:3000')
 
 	socket.on('connect', function () {
-		console.log('connected')
+		console.log(socket.id + ' connected')
+	})
+
+	// Update online players list
+	let $playersList = document.querySelector('.playerInfoContainer')
+	socket.on('updatePlayersList', (list) => {
+		$playersList.innerHTML = 'Players : </br></br>'
+		for (const _player of list) {
+			$playersList.innerHTML += _player + '</br></br>'
+		}
 	})
 
 	let ball1 = new Balls(createVector(250, 250), 'speed')
@@ -50,7 +59,10 @@ setup = () => {
 	}
 
 	// Setup socket
-	getOtherPlayersInfo()
+	socket.on('otherPlayersInfo', (info) => {
+		drawOtherPlayers(info)
+		posLogMatrix[Math.floor(info.pos.x / 60)][Math.floor(info.pos.y / 60)].push([createVector(info.pos.x, info.pos.y), info.size])
+	})
 
 	// Paint grid
 	// stroke(40)
@@ -96,38 +108,30 @@ draw = () => {
 	text('FPS: ' + fps.toFixed(0), 5, 20)
 }
 
-function getOtherPlayersInfo() {
-	socket.on('otherPlayersInfo', (pos) => {
-		// Draw other players
-		if (scene.otherPlayersPos[pos.id] === undefined) {
-			scene.otherPlayersPos[pos.id] = {}
-			scene.otherPlayersPos[pos.id].x = pos.x
-			scene.otherPlayersPos[pos.id].y = pos.y
-		} else {
-			strokeWeight(pos.size)
-			stroke(pos.skin)
-			line(scene.otherPlayersPos[pos.id].x, scene.otherPlayersPos[pos.id].y, pos.x, pos.y)
+drawOtherPlayers = (info) => {
+	// Draw other players
+	if (scene.otherPlayersPos[info.id] === undefined) {
+		scene.otherPlayersPos[info.id] = {}
+		scene.otherPlayersPos[info.id].x = info.pos.x
+		scene.otherPlayersPos[info.id].y = info.pos.y
+	} else {
+		strokeWeight(info.size)
+		stroke(info.skin)
+		line(scene.otherPlayersPos[info.id].x, scene.otherPlayersPos[info.id].y, info.pos.x, info.pos.y)
 
-			scene.otherPlayersPos[pos.id].x = pos.x
-			scene.otherPlayersPos[pos.id].y = pos.y
+		scene.otherPlayersPos[info.id].x = info.pos.x
+		scene.otherPlayersPos[info.id].y = info.pos.y
+	}
+}
+
+fillPosLogMatrix = (info) => {
+	let pos = createVector(info.pos.x, info.pos.y)
+	let size = info.size
+	setTimeout(() => {
+		if (!scene.isClearing) {
+			posLogMatrix[Math.floor(pos.x / 60)][Math.floor(pos.y / 60)].push([pos, size])
 		}
-
-		// // Updating pos
-		// let newPos = createVector()
-		// newPos.x = this.pos.x + cos(this.dir) * this.speed
-		// newPos.y = this.pos.y + sin(this.dir) * this.speed
-		// this.pos = newPos
-
-		// // Drawing line
-		// if (this.skinFrame < this.skin.length - 1) {
-		// 	this.skinFrame++
-		// } else {
-		// 	this.skinFrame = 0
-		// }
-		// strokeWeight(this.size)
-		// stroke(this.skin[this.skinFrame])
-		// line(this.pos.x, this.pos.y, newPos.x, newPos.y)
-	})
+	}, scene.selfCollisionDelay)
 }
 
 document.querySelector('.playButton').addEventListener('click', () => {
@@ -137,10 +141,7 @@ document.querySelector('.pauseButton').addEventListener('click', () => {
 	worm.canGo === true ? (worm.canGo = false) : (worm.canGo = true)
 })
 
-let player = {}
-
 // Tab change event
 document.addEventListener('visibilitychange', function () {
 	document.title = document.visibilityState
-	console.log(document.visibilityState)
 })

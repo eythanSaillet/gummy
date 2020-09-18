@@ -19,7 +19,6 @@ let worm = {
 	returnSizeIntervalID: null,
 
 	setup() {
-		console.log(socket.id)
 		this.id = socket.id
 
 		this.canGo = true
@@ -85,18 +84,28 @@ let worm = {
 		line(this.pos.x, this.pos.y, newPos.x, newPos.y)
 
 		// Send pos to server
-		socket.emit('go', { id: worm.id, x: newPos.x, y: newPos.y, size: worm.size, skin: worm.skin[worm.skinFrame] })
+		socket.emit('go', { id: worm.id, pos: { x: newPos.x, y: newPos.y }, size: worm.size, skin: worm.skin[worm.skinFrame] })
 	},
 
-	fillPosLogMatrix() {
-		let pos = this.pos
-		let size = this.size
-		setTimeout(() => {
-			if (!scene.isClearing) {
-				posLogMatrix[Math.floor(pos.x / 60)][Math.floor(pos.y / 60)].push([pos, size])
-			}
-		}, scene.selfCollisionDelay)
-	},
+	// fillPosLogMatrix() {
+	// 	let pos = this.pos
+	// 	let size = this.size
+	// 	setTimeout(() => {
+	// 		if (!scene.isClearing) {
+	// 			posLogMatrix[Math.floor(pos.x / 60)][Math.floor(pos.y / 60)].push([pos, size])
+	// 		}
+	// 	}, scene.selfCollisionDelay)
+	// },
+
+	// fillPosLogMatrix = (info) => {
+	// let pos = createVector(info.pos.x, info.pos.y)
+	// let size = info.size
+	// 	setTimeout(() => {
+	// 		if (!scene.isClearing) {
+	// 			posLogMatrix[Math.floor(info.pos.x / 60)][Math.floor(info.pos.y / 60)].push([pos, size])
+	// 		}
+	// 	}, scene.selfCollisionDelay)
+	// }
 
 	dieTest() {
 		// Map border test
@@ -123,7 +132,7 @@ let worm = {
 			}
 
 			// Fill posLogMatrix
-			this.fillPosLogMatrix()
+			fillPosLogMatrix(worm)
 		}
 	},
 

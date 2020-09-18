@@ -24,16 +24,18 @@ function newConnection(socket) {
 	console.log('New connection : ' + socket.id)
 	socket.emit('id', socket.id)
 	scene.players.push(socket.id)
+	socket.emit('updatePlayersList', scene.players)
+	socket.broadcast.emit('updatePlayersList', scene.players)
 
 	// socket.on('key', (key) => {
 	// 	console.log(key)
 	// })
 
-	// Worm pos receive
-	socket.on('go', getWormPos)
-	function getWormPos(pos) {
-		console.log(pos)
-		socket.broadcast.emit('otherPlayersInfo', pos)
+	// Worm info receive
+	socket.on('go', transmitWormInfo)
+	function transmitWormInfo(info) {
+		console.log(info)
+		socket.broadcast.emit('otherPlayersInfo', info)
 	}
 
 	// Worm die receive
@@ -54,5 +56,6 @@ function newConnection(socket) {
 				scene.players.splice(index, 1)
 			}
 		}
+		socket.broadcast.emit('updatePlayersList', scene.players)
 	}
 }
