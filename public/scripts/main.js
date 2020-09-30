@@ -145,3 +145,21 @@ document.querySelector('.pauseButton').addEventListener('click', () => {
 document.addEventListener('visibilitychange', function () {
 	document.title = document.visibilityState
 })
+
+dieAnimation = (posHistoric) => {
+	let i = posHistoric.length
+	let intervalID = setInterval(() => {
+		i--
+		if (i !== 0) {
+			if (posHistoric[i - 1] !== null) {
+				strokeWeight(posHistoric[i - 1][1])
+				stroke('grey')
+				line(posHistoric[i][0].x, posHistoric[i][0].y, posHistoric[i - 1][0].x, posHistoric[i - 1][0].y)
+			} else {
+				i -= 2
+			}
+		} else {
+			clearInterval(intervalID)
+		}
+	}, 5)
+}

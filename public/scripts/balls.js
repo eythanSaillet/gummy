@@ -144,6 +144,9 @@ let clearBallEffect = () => {
 	}
 	posLogMatrix = newPosLogMatrix
 
+	// Clear pos historic for die animation
+	worm.posHistoric = []
+
 	// Clear canvas
 	background(scene.background)
 

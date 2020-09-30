@@ -1,3 +1,12 @@
+// Import skins
+let skins
+window
+	.fetch('../skins.json')
+	.then((_response) => _response.json())
+	.then((_skins) => {
+		skins = _skins
+	})
+
 let worm = {
 	id: null,
 	canGo: false,
@@ -17,6 +26,7 @@ let worm = {
 	increaseSizeIntervalID: null,
 	decreaseSizeIntervalID: null,
 	returnSizeIntervalID: null,
+	posHistoric: [],
 
 	setup() {
 		this.id = socket.id
@@ -29,7 +39,7 @@ let worm = {
 		this.size = this.basicSize
 
 		strokeWeight(this.size)
-		this.setupSkin({ purple: 20, blue: 20, green: 20, yellow: 20, orange: 20, red: 20 })
+		this.setupSkin(skins.acidTong)
 
 		window.addEventListener('keydown', (_event) => {
 			socket.emit('key', _event.code)
@@ -85,6 +95,9 @@ let worm = {
 
 		// Send pos to server
 		socket.emit('go', { id: worm.id, pos: { x: newPos.x, y: newPos.y }, size: worm.size, skin: worm.skin[worm.skinFrame] })
+
+		// Fill pos historic for dead animation
+		this.posHistoric.push([newPos, worm.size])
 	},
 
 	// fillPosLogMatrix() {
@@ -115,6 +128,7 @@ let worm = {
 				this.pos.x > scene.width ? (this.pos.x = 0) : null
 				this.pos.y < 0 ? (this.pos.y = scene.height) : null
 				this.pos.y > scene.height ? (this.pos.y = 0) : null
+				this.posHistoric.push(null)
 			} else {
 				this.die()
 			}
@@ -139,6 +153,9 @@ let worm = {
 	die() {
 		this.dead = true
 		console.log('dead')
+
+		// Play animation
+		dieAnimation(this.posHistoric)
 
 		// Send death info to server
 		socket.emit('die', worm.id)
