@@ -13,6 +13,12 @@ let io = socket(server)
 // Global scene info
 
 scene = {
+	// SAME INFO THAN CLIENT SIDE
+	width: 600,
+	height: 600,
+	spawnMargin: 0.15,
+	//
+	maximumBalls: 10,
 	players: [],
 	wormsPos: [],
 	readyPlayers: ['dcsdcs'],
@@ -99,12 +105,38 @@ function start(delay) {
 			time--
 			io.sockets.emit('gameState', `Sarting in ${time}`)
 			if (time === 0) {
-				io.sockets.emit('start')
+				// START GAME
 				console.log('start')
+				io.sockets.emit('start')
+				startBallDisplayer()
 			} else {
 				startLoop()
 			}
 		}, 1000)
 	}
 	startLoop()
+}
+
+// Ball effect displayer
+
+let ballsProb = {
+	speed: 0.003,
+	big: 0.003,
+	tiny: 0.003,
+	wall: 0.003,
+	clear: 0.003,
+}
+function startBallDisplayer() {
+	let intervalID = setInterval(() => {
+		for (const _ball in ballsProb) {
+			if (Math.random() < ballsProb[_ball]) {
+				console.log(_ball)
+				let pos = {
+					x: Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width,
+					y: Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height,
+				}
+				io.sockets.emit('effect', { pos, _ball })
+			}
+		}
+	}, 100)
 }

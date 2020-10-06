@@ -52,18 +52,23 @@ setup = () => {
 		worm.setup()
 	})
 
-	const ball1 = new Balls(createVector(250, 250), 'speed')
-	const ball2 = new Balls(createVector(300, 300), 'big')
-	const ball3 = new Balls(createVector(100, 430), 'tiny')
-	const ball4 = new Balls(createVector(50, 400), 'speed')
-	const ball5 = new Balls(createVector(400, 50), 'big')
-	const ball6 = new Balls(createVector(185, 332), 'tiny')
-	const ball7 = new Balls(createVector(400, 400), 'wall')
-	const ball8 = new Balls(createVector(200, 200), 'wall')
-	const ball11 = new Balls(createVector(230, 230), 'wall')
-	const ball12 = new Balls(createVector(210, 240), 'wall')
-	const ball9 = new Balls(createVector(450, 400), 'clear')
-	const ball10 = new Balls(createVector(150, 230), 'clear')
+	// Listen ball displayer
+	socket.on('effect', (info) => {
+		ballsArray.push(new Balls(createVector(info.pos.x, info.pos.y), info._ball))
+	})
+
+	// ballsArray.push((ball1 = new Balls(createVector(250, 250), 'speed')))
+	// ballsArray.push((ball2 = new Balls(createVector(300, 300), 'big')))
+	// ballsArray.push((ball3 = new Balls(createVector(100, 430), 'tiny')))
+	// ballsArray.push((ball4 = new Balls(createVector(50, 400), 'speed')))
+	// ballsArray.push((ball5 = new Balls(createVector(400, 50), 'big')))
+	// ballsArray.push((ball6 = new Balls(createVector(185, 332), 'tiny')))
+	// ballsArray.push((ball7 = new Balls(createVector(400, 400), 'wall')))
+	// ballsArray.push((ball8 = new Balls(createVector(200, 200), 'wall')))
+	// ballsArray.push((ball11 = new Balls(createVector(230, 230), 'wall')))
+	// ballsArray.push((ball12 = new Balls(createVector(210, 240), 'wall')))
+	// ballsArray.push((ball9 = new Balls(createVector(450, 400), 'clear')))
+	// ballsArray.push((ball10 = new Balls(createVector(150, 230), 'clear')))
 
 	// Setup position log matrix
 	posLogMatrix = []

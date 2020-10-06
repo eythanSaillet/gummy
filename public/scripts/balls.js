@@ -9,8 +9,6 @@ class Balls {
 
 		// Drawing
 		this.draw()
-
-		ballsArray.push(this)
 	}
 
 	draw() {
