@@ -11,6 +11,7 @@ let scene = {
 	isClearing: false,
 	wallEffectTimer: 0,
 	otherPlayersPos: {},
+	isReady: false,
 }
 
 setup = () => {
@@ -27,26 +28,42 @@ setup = () => {
 	})
 
 	// Update online players list
-	let $playersList = document.querySelector('.playerInfoContainer')
-	socket.on('updatePlayersList', (list) => {
+	const $playersList = document.querySelector('.playerInfoContainer')
+	socket.on('updatePlayersList', (players, readyPlayers) => {
 		$playersList.innerHTML = 'Players : </br></br>'
-		for (const _player of list) {
-			$playersList.innerHTML += _player + '</br></br>'
+		for (const _player of players) {
+			let $span = document.createElement('span')
+			$span.innerHTML = _player
+			if (readyPlayers.includes(_player)) {
+				$span.style.color = 'green'
+			}
+			$playersList.appendChild($span)
 		}
 	})
 
-	let ball1 = new Balls(createVector(250, 250), 'speed')
-	let ball2 = new Balls(createVector(300, 300), 'big')
-	let ball3 = new Balls(createVector(100, 430), 'tiny')
-	let ball4 = new Balls(createVector(50, 400), 'speed')
-	let ball5 = new Balls(createVector(400, 50), 'big')
-	let ball6 = new Balls(createVector(185, 332), 'tiny')
-	let ball7 = new Balls(createVector(400, 400), 'wall')
-	let ball8 = new Balls(createVector(200, 200), 'wall')
-	let ball11 = new Balls(createVector(230, 230), 'wall')
-	let ball12 = new Balls(createVector(210, 240), 'wall')
-	let ball9 = new Balls(createVector(450, 400), 'clear')
-	let ball10 = new Balls(createVector(150, 230), 'clear')
+	// Update game state
+	const $gameState = document.querySelector('.gameState')
+	socket.on('gameState', (state) => {
+		$gameState.innerHTML = state
+	})
+
+	// Launch game
+	socket.on('start', () => {
+		worm.setup()
+	})
+
+	const ball1 = new Balls(createVector(250, 250), 'speed')
+	const ball2 = new Balls(createVector(300, 300), 'big')
+	const ball3 = new Balls(createVector(100, 430), 'tiny')
+	const ball4 = new Balls(createVector(50, 400), 'speed')
+	const ball5 = new Balls(createVector(400, 50), 'big')
+	const ball6 = new Balls(createVector(185, 332), 'tiny')
+	const ball7 = new Balls(createVector(400, 400), 'wall')
+	const ball8 = new Balls(createVector(200, 200), 'wall')
+	const ball11 = new Balls(createVector(230, 230), 'wall')
+	const ball12 = new Balls(createVector(210, 240), 'wall')
+	const ball9 = new Balls(createVector(450, 400), 'clear')
+	const ball10 = new Balls(createVector(150, 230), 'clear')
 
 	// Setup position log matrix
 	posLogMatrix = []
@@ -134,8 +151,12 @@ fillPosLogMatrix = (info) => {
 	}, scene.selfCollisionDelay)
 }
 
-document.querySelector('.playButton').addEventListener('click', () => {
-	worm.setup()
+document.querySelector('.readyButton').addEventListener('click', () => {
+	// worm.setup()
+	if (!scene.isReady) {
+		scene.isReady = true
+		socket.emit('ready')
+	}
 })
 document.querySelector('.pauseButton').addEventListener('click', () => {
 	worm.canGo === true ? (worm.canGo = false) : (worm.canGo = true)

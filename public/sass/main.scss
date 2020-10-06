@@ -13,3 +13,12 @@ body {
 		border: solid black 2px;
 	}
 }
+
+.playerInfoContainer {
+	display: flex;
+	flex-direction: column;
+}
+
+.gameState {
+	margin-top: 20px;
+}

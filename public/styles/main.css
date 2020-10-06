@@ -10,3 +10,10 @@ body {
   align-items: center; }
   #canvasContainer canvas {
     border: solid black 2px; }
+
+.playerInfoContainer {
+  display: flex;
+  flex-direction: column; }
+
+.gameState {
+  margin-top: 20px; }

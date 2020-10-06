@@ -15,6 +15,8 @@ let io = socket(server)
 scene = {
 	players: [],
 	wormsPos: [],
+	readyPlayers: ['dcsdcs'],
+	gameState: 'waiting',
 }
 
 // New connection
@@ -24,8 +26,23 @@ function newConnection(socket) {
 	console.log('New connection : ' + socket.id)
 	socket.emit('id', socket.id)
 	scene.players.push(socket.id)
-	socket.emit('updatePlayersList', scene.players)
-	socket.broadcast.emit('updatePlayersList', scene.players)
+	io.sockets.emit('updatePlayersList', scene.players, scene.readyPlayers)
+	// socket.emit('updatePlayersList', scene.players)
+	// socket.broadcast.emit('updatePlayersList', scene.players)
+
+	// Worm ready
+	socket.on('ready', () => {
+		// Update ready player list
+		console.log(socket.id + ' is ready')
+		scene.readyPlayers.push(socket.id)
+		io.sockets.emit('updatePlayersList', scene.players, scene.readyPlayers)
+
+		// Launch the game if all players are ready
+		if (testIfPlayersAreReady()) {
+			console.log('starting')
+			start(5)
+		}
+	})
 
 	// socket.on('key', (key) => {
 	// 	console.log(key)
@@ -56,6 +73,38 @@ function newConnection(socket) {
 				scene.players.splice(index, 1)
 			}
 		}
-		socket.broadcast.emit('updatePlayersList', scene.players)
+		socket.broadcast.emit('updatePlayersList', scene.players, scene.readyPlayers)
 	}
+}
+
+function testIfPlayersAreReady() {
+	let readyPlayers = 0
+	for (const _player of scene.players) {
+		if (scene.readyPlayers.includes(_player)) {
+			readyPlayers++
+		}
+	}
+	if (readyPlayers === scene.players.length && scene.gameState === 'waiting') {
+		scene.gameState = 'starting'
+		return true
+	}
+	return false
+}
+
+function start(delay) {
+	let time = delay
+	io.sockets.emit('gameState', `Sarting in ${time}`)
+	let startLoop = () => {
+		setTimeout(() => {
+			time--
+			io.sockets.emit('gameState', `Sarting in ${time}`)
+			if (time === 0) {
+				io.sockets.emit('start')
+				console.log('start')
+			} else {
+				startLoop()
+			}
+		}, 1000)
+	}
+	startLoop()
 }
