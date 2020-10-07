@@ -87,14 +87,14 @@ setup = () => {
 	})
 
 	// Paint grid
-	// stroke(40)
-	// strokeWeight(1)
-	// for (let i = 0; i < scene.posLogMatrixWidth; i++) {
-	// 	line((i * scene.width) / scene.posLogMatrixWidth, 0, (i * scene.width) / scene.posLogMatrixWidth, scene.height)
-	// }
-	// for (let i = 0; i < scene.posLogMatrixWidth; i++) {
-	// 	line(0, (i * scene.height) / scene.posLogMatrixHeight, scene.width, (i * scene.height) / scene.posLogMatrixHeight)
-	// }
+	stroke(40)
+	strokeWeight(1)
+	for (let i = 0; i < scene.posLogMatrixWidth; i++) {
+		line((i * scene.width) / scene.posLogMatrixWidth, 0, (i * scene.width) / scene.posLogMatrixWidth, scene.height)
+	}
+	for (let i = 0; i < scene.posLogMatrixWidth; i++) {
+		line(0, (i * scene.height) / scene.posLogMatrixHeight, scene.width, (i * scene.height) / scene.posLogMatrixHeight)
+	}
 
 	// Fps displayer
 	let fps = frameRate()

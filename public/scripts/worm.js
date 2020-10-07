@@ -135,13 +135,29 @@ let worm = {
 		}
 		// Worms collision test
 		else {
-			for (const _log of posLogMatrix[Math.floor(this.pos.x / 60)][Math.floor(this.pos.y / 60)]) {
-				if (_log[0].dist(this.pos) < _log[1] / 2 + this.size / 2 && this.dead === false) {
-					stroke('white')
-					strokeWeight(1)
-					point(this.pos)
-					point(_log)
-					this.die()
+			const testRange = [
+				[0, 1],
+				[1, 1],
+				[1, 0],
+				[1, -1],
+				[0, -1],
+				[-1, -1],
+				[-1, 0],
+				[-1, 1],
+			]
+			// Testing collision in each case around the player
+			for (const _range of testRange) {
+				// Test if the case exist
+				if (typeof posLogMatrix[Math.floor((this.pos.x + _range[0]) / 60)][Math.floor((this.pos.y + _range[1]) / 60)] !== 'undefined') {
+					for (const _log of posLogMatrix[Math.floor((this.pos.x + _range[0]) / 60)][Math.floor((this.pos.y + _range[1]) / 60)]) {
+						if (_log[0].dist(this.pos) < _log[1] / 2 + this.size / 2 && this.dead === false) {
+							stroke('white')
+							strokeWeight(1)
+							point(this.pos)
+							point(_log)
+							this.die()
+						}
+					}
 				}
 			}
 

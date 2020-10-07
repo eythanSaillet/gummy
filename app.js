@@ -46,7 +46,7 @@ function newConnection(socket) {
 		// Launch the game if all players are ready
 		if (testIfPlayersAreReady()) {
 			console.log('starting')
-			start(5)
+			start(3)
 		}
 	})
 
@@ -130,7 +130,6 @@ function startBallDisplayer() {
 	let intervalID = setInterval(() => {
 		for (const _ball in ballsProb) {
 			if (Math.random() < ballsProb[_ball]) {
-				console.log(_ball)
 				let pos = {
 					x: Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width,
 					y: Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height,
