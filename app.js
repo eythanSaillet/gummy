@@ -12,7 +12,7 @@ let io = socket(server)
 
 // Global scene info
 
-scene = {
+let scene = {
 	// SAME INFO THAN CLIENT SIDE
 	width: 600,
 	height: 600,
@@ -57,7 +57,6 @@ function newConnection(socket) {
 	// Worm info receive
 	socket.on('go', transmitWormInfo)
 	function transmitWormInfo(info) {
-		console.log(info)
 		socket.broadcast.emit('otherPlayersInfo', info)
 	}
 
@@ -120,11 +119,11 @@ function start(delay) {
 // Ball effect displayer
 
 let ballsProb = {
-	speed: 0.003,
-	big: 0.003,
-	tiny: 0.003,
-	wall: 0.003,
-	clear: 0.003,
+	speed: 0.005,
+	big: 0.005,
+	tiny: 0.005,
+	wall: 0.005,
+	clear: 0.005,
 }
 function startBallDisplayer() {
 	let intervalID = setInterval(() => {

@@ -120,7 +120,6 @@ draw = () => {
 			}
 		}
 	}
-
 	// Draw framerate
 	fps = frameRate()
 	noStroke()
@@ -137,10 +136,11 @@ drawOtherPlayers = (info) => {
 		scene.otherPlayersPos[info.id].x = info.pos.x
 		scene.otherPlayersPos[info.id].y = info.pos.y
 	} else {
-		strokeWeight(info.size)
-		stroke(info.skin)
-		line(scene.otherPlayersPos[info.id].x, scene.otherPlayersPos[info.id].y, info.pos.x, info.pos.y)
-
+		if (info.type === 'visible') {
+			strokeWeight(info.size)
+			stroke(info.skin)
+			line(scene.otherPlayersPos[info.id].x, scene.otherPlayersPos[info.id].y, info.pos.x, info.pos.y)
+		}
 		scene.otherPlayersPos[info.id].x = info.pos.x
 		scene.otherPlayersPos[info.id].y = info.pos.y
 	}
@@ -167,17 +167,12 @@ document.querySelector('.pauseButton').addEventListener('click', () => {
 	worm.canGo === true ? (worm.canGo = false) : (worm.canGo = true)
 })
 
-// Tab change event
-document.addEventListener('visibilitychange', function () {
-	document.title = document.visibilityState
-})
-
 dieAnimation = (posHistoric) => {
 	let i = posHistoric.length
 	let intervalID = setInterval(() => {
 		i--
-		if (i !== 0) {
-			if (posHistoric[i - 1] !== null) {
+		if (i >= 0) {
+			if (posHistoric[i - 1] !== null && typeof posHistoric[i - 1] !== 'undefined') {
 				strokeWeight(posHistoric[i - 1][1])
 				stroke('grey')
 				line(posHistoric[i][0].x, posHistoric[i][0].y, posHistoric[i - 1][0].x, posHistoric[i - 1][0].y)
