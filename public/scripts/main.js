@@ -1,5 +1,28 @@
 let socket, canvas, canvas2, posLogMatrix
 
+let setupPosLogMatrix = () => {
+	posLogMatrix = []
+	for (let i = 0; i < scene.posLogMatrixWidth; i++) {
+		let tab = []
+		for (let j = 0; j < scene.posLogMatrixHeight; j++) {
+			tab.push([])
+		}
+		posLogMatrix.push(tab)
+	}
+}
+const $playersList = document.querySelector('.playerInfoContainer')
+let updatePlayersList = (players, readyPlayers) => {
+	$playersList.innerHTML = 'Players : </br></br>'
+	for (const _player of players) {
+		let $span = document.createElement('span')
+		$span.innerHTML = _player
+		if (readyPlayers.includes(_player)) {
+			$span.style.color = 'green'
+		}
+		$playersList.appendChild($span)
+	}
+}
+
 let scene = {
 	width: 600,
 	height: 600,
@@ -12,6 +35,7 @@ let scene = {
 	wallEffectTimer: 0,
 	otherPlayersPos: {},
 	isReady: false,
+	$gameState: document.querySelector('.gameState'),
 }
 
 setup = () => {
@@ -28,23 +52,13 @@ setup = () => {
 	})
 
 	// Update online players list
-	const $playersList = document.querySelector('.playerInfoContainer')
 	socket.on('updatePlayersList', (players, readyPlayers) => {
-		$playersList.innerHTML = 'Players : </br></br>'
-		for (const _player of players) {
-			let $span = document.createElement('span')
-			$span.innerHTML = _player
-			if (readyPlayers.includes(_player)) {
-				$span.style.color = 'green'
-			}
-			$playersList.appendChild($span)
-		}
+		updatePlayersList(players, readyPlayers)
 	})
 
 	// Update game state
-	const $gameState = document.querySelector('.gameState')
 	socket.on('gameState', (state) => {
-		$gameState.innerHTML = state
+		scene.$gameState.innerHTML = state
 	})
 
 	// Launch game
@@ -65,14 +79,7 @@ setup = () => {
 	// ballsArray.push((ball10 = new Balls(createVector(150, 230), 'clear')))
 
 	// Setup position log matrix
-	posLogMatrix = []
-	for (let i = 0; i < scene.posLogMatrixWidth; i++) {
-		let tab = []
-		for (let j = 0; j < scene.posLogMatrixHeight; j++) {
-			tab.push([])
-		}
-		posLogMatrix.push(tab)
-	}
+	setupPosLogMatrix()
 
 	// Setup socket
 	socket.on('otherPlayersInfo', (info) => {
@@ -84,13 +91,18 @@ setup = () => {
 	socket.on('effectBroadcast', (_id) => {
 		for (let i = ballsArray.length - 1; i >= 0; i--) {
 			if (_id === ballsArray[i].id) {
-				if (ballsArray[i].type === 'wall' || 'clear') {
+				if (ballsArray[i].type === 'wall' || ballsArray[i].type === 'clear') {
 					ballsTypes[ballsArray[i].type].effect()
 				}
 				ballsArray[i].erase()
 				ballsArray.splice(i, 1)
 			}
 		}
+	})
+
+	// Reset
+	socket.on('reset', (players, readyPlayers) => {
+		resetGame(players, readyPlayers)
 	})
 
 	// Paint grid
@@ -193,6 +205,23 @@ document.querySelector('.readyButton').addEventListener('click', () => {
 })
 document.querySelector('.pauseButton').addEventListener('click', () => {
 	worm.canGo === true ? (worm.canGo = false) : (worm.canGo = true)
+})
+
+// Reset
+
+resetGame = (players, readyPlayers) => {
+	worm.canGo = false
+	scene.otherPlayersPos = {}
+	scene.isReady = false
+	posLogMatrix = undefined
+	ballsArray = []
+	background(scene.background)
+	setupPosLogMatrix()
+	updatePlayersList(players, readyPlayers)
+	scene.$gameState.innerHTML = 'Not all players are ready'
+}
+document.querySelector('.resetButton').addEventListener('click', () => {
+	socket.emit('reset')
 })
 
 dieAnimation = (posHistoric) => {

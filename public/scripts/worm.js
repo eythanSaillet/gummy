@@ -12,8 +12,7 @@ let worm = {
 	canGo: false,
 	pos: null,
 	newPos: null,
-	dir: Math.round(Math.random() * 360),
-	// dir: 90,
+	dir: null,
 	basicSpeed: 1,
 	speed: null,
 	basicSize: 8,
@@ -35,10 +34,18 @@ let worm = {
 	trailSpaceLastPoint: null,
 
 	setup() {
+		// Reset
+		this.newPos = null
+		this.skinFrame = 0
+		this.dead = false
+		this.posHistoric = []
+		//
+		
 		this.id = socket.id
 
 		this.canGo = true
 
+		this.dir = Math.round(Math.random() * 360)
 		this.pos = createVector(Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width, Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height)
 		this.newPos = createVector()
 

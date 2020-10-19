@@ -21,8 +21,8 @@ let scene = {
 	//
 	maximumBalls: 10,
 	players: [],
+	readyPlayers: [],
 	wormsPos: [],
-	readyPlayers: ['dcsdcs'],
 	gameState: 'waiting',
 	balls: [],
 	maxBalls: 10,
@@ -92,6 +92,20 @@ function newConnection(socket) {
 			}
 		}
 	})
+
+	// Reset
+	socket.on('reset', () => {
+		
+		// Reset serv info
+		scene.readyPlayers = []
+		io.sockets.emit('reset', scene.players, scene.readyPlayers)
+		scene.wormsPos = []
+		scene.gameState = 'waiting'
+		clearInterval(ballDisplayerIntervalID)
+		scene.balls = []
+
+		io.sockets.emit('updatePlayersList', scene.players, scene.readyPlayers)
+	})
 }
 
 function testIfPlayersAreReady() {
@@ -137,8 +151,10 @@ let ballsProb = {
 	wall: 0.004,
 	clear: 0.004,
 }
+
+let ballDisplayerIntervalID
 function startBallDisplayer() {
-	let intervalID = setInterval(() => {
+	ballDisplayerIntervalID = setInterval(() => {
 		if (scene.balls.length < scene.maxBalls) {
 			for (const _ball in ballsProb) {
 				if (Math.random() < ballsProb[_ball] * scene.players.length) {
