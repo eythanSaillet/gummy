@@ -11,6 +11,7 @@ let worm = {
 	id: null,
 	canGo: false,
 	pos: null,
+	newPos: null,
 	dir: Math.round(Math.random() * 360),
 	// dir: 90,
 	basicSpeed: 1,
@@ -30,7 +31,7 @@ let worm = {
 	trailSpaceSize: 25,
 	trailSpaceDelay: 300,
 	trailSpaceCounter: 25,
-	head: null,
+	headCanvas: null,
 	trailSpaceLastPoint: null,
 
 	setup() {
@@ -39,12 +40,19 @@ let worm = {
 		this.canGo = true
 
 		this.pos = createVector(Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width, Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height)
+		this.newPos = createVector()
 
 		this.speed = this.basicSpeed
 		this.size = this.basicSize
 
 		strokeWeight(this.size)
 		this.setupSkin(skins.acidTong)
+
+		this.headCanvas = createGraphics(100, 100)
+		this.headCanvas.stroke('red')
+		this.headCanvas.strokeWeight(15)
+		this.headCanvas.point(200, 200)
+		image(this.headCanvas, 0, 0)
 
 		window.addEventListener('keydown', (_event) => {
 			socket.emit('key', _event.code)
@@ -83,11 +91,10 @@ let worm = {
 		this.control.goLeft === true ? (this.dir -= this.control.sensitivity) : null
 
 		// Updating pos
-		let tempPos = this.pos
-		let newPos = createVector()
-		newPos.x = this.pos.x + cos(this.dir) * this.speed
-		newPos.y = this.pos.y + sin(this.dir) * this.speed
-		this.pos = newPos
+		this.newPos = createVector()
+		this.newPos.x = this.pos.x + cos(this.dir) * this.speed
+		this.newPos.y = this.pos.y + sin(this.dir) * this.speed
+		this.pos = this.newPos
 
 		// Update skin color
 		if (this.skinFrame < this.skin.length - 1) {
@@ -96,42 +103,24 @@ let worm = {
 			this.skinFrame = 0
 		}
 
-		// Set last point of space trail
-		if (this.trailSpaceCounter === 0) {
-			this.trailSpaceLastPoint = { pos: tempPos, color: this.skin[this.skinFrame], size: this.size }
-		}
-
 		// Test trail space
 		if (this.trailSpaceCounter >= this.trailSpaceSize) {
 			// Drawing line
 			strokeWeight(this.size)
 			stroke(this.skin[this.skinFrame])
-			line(this.pos.x, this.pos.y, newPos.x, newPos.y)
+			line(this.pos.x, this.pos.y, this.newPos.x, this.newPos.y)
 
 			// Fill pos historic for dead animation
-			this.posHistoric.push([newPos, worm.size])
+			this.posHistoric.push([this.newPos, worm.size])
 
 			// Send pos to server
-			socket.emit('go', { id: worm.id, pos: { x: newPos.x, y: newPos.y }, size: worm.size, skin: worm.skin[worm.skinFrame], type: 'visible' })
+			socket.emit('go', { id: worm.id, pos: { x: this.newPos.x, y: this.newPos.y }, size: worm.size, skin: worm.skin[worm.skinFrame], type: 'visible' })
 		} else {
-			// Draw last point of space trail
-			strokeWeight(this.trailSpaceLastPoint.size + 0.3)
-			stroke(this.trailSpaceLastPoint.color)
-			point(this.trailSpaceLastPoint.pos.x, this.trailSpaceLastPoint.pos.y)
-
 			// Fill pos historic for dead animation
 			this.posHistoric.push(null)
 
-			// Draw head
-			strokeWeight(this.size + 0.2)
-			stroke(scene.background)
-			point(tempPos.x, tempPos.y)
-			strokeWeight(this.size)
-			stroke(this.skin[this.skinFrame])
-			point(newPos.x, newPos.y)
-
 			// Send pos to server
-			socket.emit('go', { id: worm.id, pos: { x: newPos.x, y: newPos.y }, size: worm.size, skin: worm.skin[worm.skinFrame], type: 'hidden' })
+			socket.emit('go', { id: worm.id, pos: { x: this.newPos.x, y: this.newPos.y }, size: worm.size, skin: worm.skin[worm.skinFrame], type: 'hidden' })
 		}
 		this.trailSpaceCounter++
 

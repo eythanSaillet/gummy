@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require('uuid');
 let express = require('express')
 let app = express()
 let port = process.env.PORT || 3000
@@ -23,6 +24,8 @@ let scene = {
 	wormsPos: [],
 	readyPlayers: ['dcsdcs'],
 	gameState: 'waiting',
+	balls: [],
+	maxBalls: 10,
 }
 
 // New connection
@@ -63,8 +66,7 @@ function newConnection(socket) {
 	// Worm die receive
 	socket.on('die', wormDie)
 	function wormDie() {
-		console.log('dead')
-		console.log(socket.id)
+		console.log('dead :' + socket.id)
 	}
 
 	// Deconnection
@@ -80,6 +82,16 @@ function newConnection(socket) {
 		}
 		socket.broadcast.emit('updatePlayersList', scene.players, scene.readyPlayers)
 	}
+
+	// Ball info broadcast
+	socket.on('effectBroadcast', (_id) => {
+		io.sockets.emit('effectBroadcast', _id)
+		for (let i = scene.balls.length - 1; i >= 0; i--) {
+			if (_id === scene.balls[i].id) {
+				scene.balls.splice(i, 1)
+			}
+		}
+	})
 }
 
 function testIfPlayersAreReady() {
@@ -119,21 +131,25 @@ function start(delay) {
 // Ball effect displayer
 
 let ballsProb = {
-	speed: 0.005,
-	big: 0.005,
-	tiny: 0.005,
-	wall: 0.005,
-	clear: 0.005,
+	speed: 0.004,
+	big: 0.004,
+	tiny: 0.0099,
+	wall: 0.004,
+	clear: 0.004,
 }
 function startBallDisplayer() {
 	let intervalID = setInterval(() => {
-		for (const _ball in ballsProb) {
-			if (Math.random() < ballsProb[_ball]) {
-				let pos = {
-					x: Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width,
-					y: Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height,
+		if (scene.balls.length < scene.maxBalls) {
+			for (const _ball in ballsProb) {
+				if (Math.random() < ballsProb[_ball] * scene.players.length) {
+					let pos = {
+						x: Math.random() * (scene.width - scene.spawnMargin * scene.width * 2) + scene.spawnMargin * scene.width,
+						y: Math.random() * (scene.height - scene.spawnMargin * scene.height * 2) + scene.spawnMargin * scene.height,
+					}
+					let id = uuidv4()
+					io.sockets.emit('displayEffect', { pos, _ball, id})
+					scene.balls.push({pos, id})
 				}
-				io.sockets.emit('effect', { pos, _ball })
 			}
 		}
 	}, 100)

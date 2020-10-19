@@ -1,7 +1,8 @@
 let ballsArray = []
 
 class Balls {
-	constructor(pos, type) {
+	constructor(pos, type, id) {
+		this.id = id
 		this.pos = pos
 		this.size = 12
 		this.type = type

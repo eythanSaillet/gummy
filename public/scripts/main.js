@@ -1,4 +1,4 @@
-let socket, canvas, posLogMatrix
+let socket, canvas, canvas2, posLogMatrix
 
 let scene = {
 	width: 600,
@@ -53,19 +53,13 @@ setup = () => {
 	})
 
 	// Listen ball displayer
-	socket.on('effect', (info) => {
-		ballsArray.push(new Balls(createVector(info.pos.x, info.pos.y), info._ball))
+	socket.on('displayEffect', (_info) => {
+		ballsArray.push(new Balls(createVector(_info.pos.x, _info.pos.y), _info._ball, _info.id))
 	})
 
 	// ballsArray.push((ball1 = new Balls(createVector(250, 250), 'speed')))
 	// ballsArray.push((ball2 = new Balls(createVector(300, 300), 'big')))
 	// ballsArray.push((ball3 = new Balls(createVector(100, 430), 'tiny')))
-	// ballsArray.push((ball4 = new Balls(createVector(50, 400), 'speed')))
-	// ballsArray.push((ball5 = new Balls(createVector(400, 50), 'big')))
-	// ballsArray.push((ball6 = new Balls(createVector(185, 332), 'tiny')))
-	// ballsArray.push((ball7 = new Balls(createVector(400, 400), 'wall')))
-	// ballsArray.push((ball8 = new Balls(createVector(200, 200), 'wall')))
-	// ballsArray.push((ball11 = new Balls(createVector(230, 230), 'wall')))
 	// ballsArray.push((ball12 = new Balls(createVector(210, 240), 'wall')))
 	// ballsArray.push((ball9 = new Balls(createVector(450, 400), 'clear')))
 	// ballsArray.push((ball10 = new Balls(createVector(150, 230), 'clear')))
@@ -86,6 +80,19 @@ setup = () => {
 		posLogMatrix[Math.floor(info.pos.x / 60)][Math.floor(info.pos.y / 60)].push([createVector(info.pos.x, info.pos.y), info.size])
 	})
 
+	// Setup balls broadcast socket
+	socket.on('effectBroadcast', (_id) => {
+		for (let i = ballsArray.length - 1; i >= 0; i--) {
+			if (_id === ballsArray[i].id) {
+				if (ballsArray[i].type === 'wall' || 'clear') {
+					ballsTypes[ballsArray[i].type].effect()
+				}
+				ballsArray[i].erase()
+				ballsArray.splice(i, 1)
+			}
+		}
+	})
+
 	// Paint grid
 	stroke(40)
 	strokeWeight(1)
@@ -100,6 +107,15 @@ setup = () => {
 	let fps = frameRate()
 	fill(255)
 	stroke(0)
+
+	// Setup graphics for worms heads
+	// scene.headsGraphics = createGraphics(scene.width, scene.height)
+	// worm.headCanvas = createGraphics(scene.width, scene.height)
+	// worm.headCanvas.stroke('red')
+	// worm.headCanvas.strokeWeight(15)
+	// worm.headCanvas.point(200, 0)
+	// image(worm.headCanvas, 0, 50)
+	// worm.headCanvas.remove()
 }
 
 draw = () => {
@@ -115,6 +131,9 @@ draw = () => {
 				ballsTypes[ballsArray[i].type].effect()
 				// Erase ball from the canvas
 				ballsArray[i].erase()
+				// Broadcast info to other player
+				socket.emit('effectBroadcast', ballsArray[i].id)
+
 				// Remove ball from the array
 				ballsArray.splice(i, 1)
 			}
@@ -127,6 +146,15 @@ draw = () => {
 	square(0, 0, 60, 10)
 	fill('white')
 	text('FPS: ' + fps.toFixed(0), 5, 20)
+
+	// if (worm.canGo) {
+	// Draw head
+	// scene.headsGraphics = createGraphics(scene.width, scene.height)
+	// scene.headsGraphics.strokeWeight(worm.size)
+	// scene.headsGraphics.stroke('red')
+	// scene.headsGraphics.line(worm.pos.x, worm.pos.y, worm.newPos.x, worm.newPos.y)
+	// image(scene.headsGraphics, 0, 0)
+	// }
 }
 
 drawOtherPlayers = (info) => {
