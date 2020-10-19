@@ -45,7 +45,8 @@ setup = () => {
 	angleMode(DEGREES)
 	// strokeCap(SQUARE)
 
-	socket = io.connect('localhost:3000' || window.location.href)
+	console.log(process.env)
+	socket = io.connect(window.location.href)
 
 	socket.on('connect', function () {
 		console.log(socket.id + ' connected')
